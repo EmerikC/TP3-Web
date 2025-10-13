@@ -44,11 +44,13 @@ function showBookmarks() {
     $('#bookmarkForm').hide();
     $('#aboutContainer').hide();
     $("#createBookmark").show();
+    $('#aboutCmd').show()
     Bookmarks_API.resume_Periodic_Refresh();
 }
 function hideBookmarks() {
     $("#scrollPanel").hide();
     $("#createBookmark").hide();
+    $('#aboutCmd').hide();
     $("#abort").show();
     Bookmarks_API.stop_Periodic_Refresh();
 }

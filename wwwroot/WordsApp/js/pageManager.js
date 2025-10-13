@@ -6,7 +6,7 @@ class PageManager {
     // getItemsCallBack is a function that collect and render all items in the itemsPanel
     // and must return true when there is no more data to collect
     constructor(scrollPanelId, itemsPanelId, itemSampleId, getItemsCallBack) {
-        this.loadMoreTriggerMargin = 10;
+
         this.itemsPanelId = itemsPanelId;
         this.hidden = false;
         this.scrollPanel = $(`#${scrollPanelId}`);
@@ -16,7 +16,7 @@ class PageManager {
             width: $(`#${itemSampleId}`).outerWidth(),
             height: $(`#${itemSampleId}`).outerHeight()
         };
-
+        this.loadMoreTriggerMargin = this.itemLayout.height;
         this.itemsPanel.empty();
 
         this.itemsPanel_alt = this.itemsPanel.clone(true, true);
@@ -62,7 +62,7 @@ class PageManager {
         let nbRows = Math.round(this.scrollPanel.innerHeight() / this.itemLayout.height);
         this.currentPage.limit = nbRows * nbColumns + nbColumns /* make sure to always have a content overflow */;
     }
-    currentPageToQueryString(append = false) {
+    currentPageToQueryString(append) {
         this.setCurrentPageLimit();
         let limit = this.currentPage.limit;
         let offset = this.currentPage.offset;
@@ -100,12 +100,14 @@ class PageManager {
     append(elem) {
         this.itemsPanel_alt.append(elem);
     }
+
     async update(append = true) {
+
         if (!this.hidden) this.storeScrollPosition();
         if (!append)
             this.itemsPanel_alt.empty();
         let endOfData = await this.getItems(this.currentPageToQueryString(append));
-       
+
         // replace itemsPanel content with itemsPanel_Alt
         // in this manner we avoid client refresh blinks
         $(`#${this.itemsPanelId}`).replaceWith(this.itemsPanel_alt);
@@ -121,8 +123,9 @@ class PageManager {
         if (!this.hidden) this.restoreScrollPosition();
 
         let instance = this;
-        this.scrollPanel.off();
-        this.scrollPanel.on('scroll', async function (e) {
+
+        this.scrollPanel.scroll(async function (e) {
+            
             if (!endOfData && (instance.scrollPanel.scrollTop() + instance.scrollPanel.outerHeight() >= instance.itemsPanel.outerHeight() - instance.loadMoreTriggerMargin)) {
                 instance.scrollPanel.off();
                 instance.currentPage.offset++;

@@ -1,13 +1,12 @@
 const periodicRefreshPeriod = 10;
 let categories = [];
 let selectedCategory = "";
-let currentETag = "";
-let hold_Periodic_Refresh = false;
 let pageManager;
 let itemLayout;
 
 let waiting = null;
 let waitingGifTrigger = 2000;
+
 function addWaitingGif() {
     clearTimeout(waiting);
     waiting = setTimeout(() => {
@@ -22,9 +21,8 @@ function removeWaitingGif() {
 Init_UI();
 
 async function Init_UI() {
-
     pageManager = new PageManager('scrollPanel', 'itemsPanel', 'sample', renderBookmarks);
-    compileCategories();
+
     $('#createBookmark').on("click", async function () {
         renderCreateBookmarkForm();
     });
@@ -36,8 +34,8 @@ async function Init_UI() {
         renderAbout();
     });
     showBookmarks();
-    await pageManager.show(true);
-    start_Periodic_Refresh();
+
+    Bookmarks_API.start_Periodic_Refresh(async () => { await pageManager.update(); });
 }
 function showBookmarks() {
     $("#actionTitle").text("Liste des favoris");
@@ -46,27 +44,15 @@ function showBookmarks() {
     $('#bookmarkForm').hide();
     $('#aboutContainer').hide();
     $("#createBookmark").show();
-    hold_Periodic_Refresh = false;
+    Bookmarks_API.resume_Periodic_Refresh();
 }
 function hideBookmarks() {
     $("#scrollPanel").hide();
     $("#createBookmark").hide();
     $("#abort").show();
-    hold_Periodic_Refresh = true;
+    Bookmarks_API.stop_Periodic_Refresh();
 }
-function start_Periodic_Refresh() {
-    setInterval(async () => {
-        if (!hold_Periodic_Refresh) {
-            let etag = await Bookmarks_API.HEAD();
-            if (currentETag != etag) {
-                currentETag = etag;
-                await pageManager.update(false);
-                compileCategories();
-            }
-        }
-    },
-        periodicRefreshPeriod * 1000);
-}
+
 function renderAbout() {
     hideBookmarks();
     $("#actionTitle").text("À propos...");
@@ -132,9 +118,9 @@ async function renderBookmarks(queryString) {
     queryString += "&sort=category,title";
     if (selectedCategory != "") queryString += "&category=" + selectedCategory;
     addWaitingGif();
+    compileCategories();
     let response = await Bookmarks_API.Get(queryString);
     if (!Bookmarks_API.error) {
-        currentETag = response.ETag;
         let Bookmarks = response.data;
         if (Bookmarks.length > 0) {
             Bookmarks.forEach(Bookmark => {
@@ -221,7 +207,7 @@ async function renderDeleteBookmarkForm(id) {
                 await Bookmarks_API.Delete(Bookmark.Id);
                 if (!Bookmarks_API.error) {
                     showBookmarks();
-                    await pageManager.update(false);
+                    await pageManager.update();
                     compileCategories();
                 }
                 else {
@@ -319,7 +305,7 @@ function renderBookmarkForm(Bookmark = null) {
         Bookmark = await Bookmarks_API.Save(Bookmark, create);
         if (!Bookmarks_API.error) {
             showBookmarks();
-            await pageManager.update(false);
+            await pageManager.update();
             compileCategories();
             pageManager.scrollToElem(Bookmark.Id);
         }

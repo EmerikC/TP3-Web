@@ -34,9 +34,12 @@
     align-items: center;
 }
 
-.wordRow {
+.wordRowX { 
+    /* très couteux et peu causer des arrêts momentanés du défilement 
+      renommer à .wordRow pour l'activer */
     scroll-snap-align: start;
 }
+
 hr {
     margin:0px;
 }

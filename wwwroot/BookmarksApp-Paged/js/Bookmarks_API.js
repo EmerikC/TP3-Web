@@ -1,12 +1,16 @@
-
 class Bookmarks_API {
-   // static API_URL() { return "https://api-server-2025.azurewebsites.net/api/bookmarks" };
+    // static API_URL() { return "https://linuxapiserver.azurewebsites.net/api/bookmarks" };
     static API_URL() { return "http://localhost:5000/api/bookmarks" };
     static initHttpState() {
         this.currentHttpError = "";
         this.currentStatus = 0;
         this.error = false;
     }
+
+    static currentETag = '';
+    static hold_Periodic_Refresh = false;
+    static periodicRefreshPeriod = 3; // seconds
+
     static setHttpErrorState(xhr) {
         if (xhr.responseJSON)
             this.currentHttpError = xhr.responseJSON.error_description;
@@ -15,6 +19,26 @@ class Bookmarks_API {
         this.currentStatus = xhr.status;
         this.error = true;
     }
+    static start_Periodic_Refresh(callback) {
+        callback();
+        setInterval(async () => {
+            if (!this.hold_Periodic_Refresh) {
+                let etag = await this.HEAD();
+                console.log(this.currentETag)
+                if (this.currentETag != etag) {
+                    this.currentETag = etag;
+                    console.log('refresh')
+                    callback();
+                }
+            }
+        }, this.periodicRefreshPeriod * 1000);
+    }
+    static resume_Periodic_Refresh () {
+        this.hold_Periodic_Refresh = false;
+    }
+    static stop_Periodic_Refresh () {
+        this.hold_Periodic_Refresh = true;
+    }
     static async HEAD() {
         Bookmarks_API.initHttpState();
         return new Promise(resolve => {
@@ -22,7 +46,9 @@ class Bookmarks_API {
                 url: this.API_URL(),
                 type: 'HEAD',
                 contentType: 'text/plain',
-                complete: data => { resolve(data.getResponseHeader('ETag')); },
+                complete: data => {
+                    resolve(data.getResponseHeader('ETag'));
+                },
                 error: (xhr) => { Bookmarks_API.setHttpErrorState(xhr); resolve(null); }
             });
         });
@@ -32,7 +58,10 @@ class Bookmarks_API {
         return new Promise(resolve => {
             $.ajax({
                 url: this.API_URL() + (id != null ? "/" + id : ""),
-                complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
+                complete: data => {
+                    this.currentETag = data.getResponseHeader('ETag');
+                    resolve({ ETag: this.currentETag, data: data.responseJSON });
+                },
                 error: (xhr) => { Bookmarks_API.setHttpErrorState(xhr); resolve(null); }
             });
         });

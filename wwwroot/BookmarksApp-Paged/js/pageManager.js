@@ -100,7 +100,7 @@ class PageManager {
     append(elem) {
         this.itemsPanel_alt.append(elem);
     }
-    async update(append = true) {
+    async update(append = false) {
         if (!this.hidden) this.storeScrollPosition();
         if (!append)
             this.itemsPanel_alt.empty();

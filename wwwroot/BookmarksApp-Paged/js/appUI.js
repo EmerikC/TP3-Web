@@ -110,11 +110,11 @@ async function compileCategories() {
                 if (!categories.includes(item.Category))
                     categories.push(item.Category);
             })
-            updateDropDownMenu(categories);
+            updateDropDownMenu();
         }
     }
 }
-async function renderBookmarks(queryString) {
+async function renderBookmarks(container, queryString) {
     deleteError();
     let endOfData = false;
     queryString += "&sort=category,title";
@@ -126,7 +126,7 @@ async function renderBookmarks(queryString) {
         let Bookmarks = response.data;
         if (Bookmarks.length > 0) {
             Bookmarks.forEach(Bookmark => {
-                pageManager.append(renderBookmark(Bookmark));
+                container.append(renderBookmark(Bookmark));
             });
             $(".editCmd").off();
             $(".editCmd").on("click", function () {

@@ -9,7 +9,7 @@ class Bookmarks_API {
 
     static currentETag = '';
     static hold_Periodic_Refresh = false;
-    static periodicRefreshPeriod = 3; // seconds
+    static periodicRefreshPeriod = 5; // seconds
 
     static setHttpErrorState(xhr) {
         if (xhr.responseJSON)

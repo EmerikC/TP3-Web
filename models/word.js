@@ -8,9 +8,9 @@ export default class Word extends Model {
 
         this.addField('Val', 'string');
         this.addField('Def', 'string');
-        this.addField('Con', 'string');
+        /*this.addField('Con', 'string');
         this.addField('Dom', 'string');
-        this.addField('Gen', 'string');
+        this.addField('Gen', 'string');*/
 
         this.setKey("Val");
     }

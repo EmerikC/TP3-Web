@@ -3,8 +3,9 @@
 class PageManager {
     // scrollPanelId represent the container that allow to scroll through itemsPanel
     // itemSampleId is used to find the size of items in pixels
-    // getItemsCallBack is a function that collect and render all items in the itemsPanel
-    // and must return true when there is no more data to collect
+    //
+    // getItemsCallBack(container, queryString) is a function that collect and render all items in the itemsPanel
+    // it must return true when end of data is reached at a specifc limit and offset values
     constructor(scrollPanelId, itemsPanelId, itemSampleId, getItemsCallBack) {
         this.loadMoreTriggerMargin = 10;
         this.itemsPanelId = itemsPanelId;
@@ -104,7 +105,7 @@ class PageManager {
         if (!this.hidden) this.storeScrollPosition();
         if (!append)
             this.itemsPanel_alt.empty();
-        let endOfData = await this.getItems(this.currentPageToQueryString(append));
+        let endOfData = await this.getItems(this.itemsPanel_alt, this.currentPageToQueryString(append));
 
         // replace itemsPanel content with itemsPanel_Alt
         // in this manner we avoid client refresh blinks

@@ -57,7 +57,7 @@ function renderError(message) {
         `)
     );
 }
-async function renderWords(queryString) {
+async function renderWords(container, queryString) {
     if (search != "") queryString += "&keywords=" + search;
     addWaitingGif();
     let endOfData = true;
@@ -66,7 +66,7 @@ async function renderWords(queryString) {
         renderError(API.currentHttpError);
     else
         if (words.length > 0) {
-            words.forEach(word => { pageManager.append(renderWord(word)); });
+            words.forEach(word => { container.append(renderWord(word)); });
             endOfData = false;
         } else console.log('end of data')
     removeWaitingGif();

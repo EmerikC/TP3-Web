@@ -149,10 +149,11 @@ export default class collectionFilter {
             fieldName = fieldName.slice(1);
             ascending = false;
         }
-        return {
-            name: this.normalizeName(fieldName),
-            ascending
-        };
+        let name = this.normalizeName(fieldName);
+        if (this.validFieldName("sort param", name))
+            return { name, ascending };
+        else
+            return null;
     }
     makeSortFields(fieldNames) {
         let names = fieldNames.split(",");

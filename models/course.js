@@ -11,8 +11,8 @@ export default class Course extends Model {
         this.setKey("Code");
     }
 
-    bindExtraData(instance) {
-        this.join(instance, "Students", RegistrationModel, StudentModel);
-        return instance;
+    bindExtraData(course) {
+        this.join(course, "Students", RegistrationModel, StudentModel);
+        return course;
     }
 }

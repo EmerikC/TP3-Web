@@ -10,8 +10,8 @@ export default class Student extends Model {
         this.setKey("Name");
     }
 
-    bindExtraData(instance) {
-        this.join(instance, "Courses", RegistrationModel, CourseModel);
-        return instance;
+    bindExtraData(student) {
+        this.join(student, "Courses", RegistrationModel, CourseModel);
+        return student;
     }
 }

@@ -171,15 +171,15 @@ export default class Repository {
         }
         return false;
     }
-    getAll(params = null, dontBind = false) {
+     getAll(params = null, dontBind = false) {
         let objectsList = this.objects();
         let bindedDatas = [];
         if (objectsList)
             for (let data of objectsList) {
                 if (dontBind)
-                    bindedDatas.push(data);
+                    bindedDatas.push( this.model.completeAssetsPath(data));
                 else
-                    bindedDatas.push(this.model.bindExtraData(data));
+                    bindedDatas.push(this.model.bindExtraData( this.model.completeAssetsPath(data)));
             }
         let collectionFilter = new CollectionFilter(bindedDatas, params, this.model);
         if (collectionFilter.valid())
@@ -189,20 +189,21 @@ export default class Repository {
             return null;
         }
     }
-    get(id, dontBind = false) { // dontbind is used in Model.bindExtraData: set to true when joining data from another model
+    get(id, dontBind = false) {
         if (!this.model.securedId)
             id = parseInt(id);
         for (let object of this.objects()) {
             if (object.Id === id) {
+
                 if (dontBind)
-                    return object;
+                    return  this.model.completeAssetsPath(object);
                 else
-                    return this.model.bindExtraData(object);
+                    return this.model.bindExtraData( this.model.completeAssetsPath(object));
             }
         }
         return null;
     }
-    removeByIndex(indexToDelete) {
+   removeByIndex(indexToDelete) {
         if (indexToDelete.length > 0) {
             utilities.deleteByIndex(this.objects(), indexToDelete);
             this.write();

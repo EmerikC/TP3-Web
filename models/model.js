@@ -1,26 +1,21 @@
 /////////////////////////////////////////////////////////////////////
-// This abstrack class provide a model scheme
+// This class provide a model scheme
 /////////////////////////////////////////////////////////////////////
 // Author : Nicolas Chourot
 // Lionel-Groulx College
 /////////////////////////////////////////////////////////////////////
 import * as utilities from '../utilities.js';
+import Repository from './repository.js';
 import * as AssetsRepository from './assetsManager.js';
-
 export default class Model {
     constructor(securedId = false) {
-        // Enforce abstrack class
-        if (new.target === Model) {
-            throw new Error("Cannot instantiate abstract class Model directly.");
-        }
         this.fields = [];
-        this.key = null;
-        this.securedId = securedId;
-        // securedId use UUID instead of incremented integer
         if (securedId)
             this.addField('Id', 'string');
         else
             this.addField('Id', 'integer');
+        this.key = null;
+        this.securedId = securedId;
         this.state = { isValid: true, inConflict: false, notFound: false, errors: [] };
     }
     addField(propertyName, propertyType) {
@@ -87,6 +82,53 @@ export default class Model {
             }
         }
     }
+    join(instance, jointName, jointModel, targetModel, selectedMembers = "") {
+        let jointModelRepository = new Repository(new jointModel());
+        let targetModelRepository = new Repository(new targetModel());
+        let joints = jointModelRepository.findByFilter(j => j[this.getClassName() + "Id"] == instance.Id);
+        let jointRecords = [];
+        for (let joint of joints) {
+            let jointRecord = targetModelRepository.get(joint[targetModelRepository.model.getClassName() + "Id"], true /*do not bind extra data / prevent from infinite loop */);
+            if (jointRecord) {
+                if (selectedMembers == "") {
+                    jointRecords.push(jointRecord);
+                } else {
+                    let jr = {};
+                    selectedMembers.split(',').forEach(member => {
+                        member = member.trim();
+                        jr[member] = jointRecord[member];
+                    });
+                    jointRecords.push(jr);
+                }
+            }
+        }
+        instance[jointName] = jointRecords;
+    }
+
+    async bind(instance, foreignKeyName, sourceModel, selectedMembers = "") {
+        let sourceModelRepository = new Repository(new sourceModel());
+        let sourceModelRecord = sourceModelRepository.get(instance[foreignKeyName]);
+        foreignKeyName = foreignKeyName.slice(0, -2); // remove Id caracters
+        if (selectedMembers == "") {
+            if (sourceModelRecord != null)
+                instance[foreignKeyName] = sourceModelRecord;
+            else
+                instance[foreignKeyName] = {};
+        } else {
+            if (sourceModelRecord != null) {
+                selectedMembers.split(',').forEach(member => {
+                    member = member.trim();
+                    instance[foreignKeyName + member] = sourceModelRecord[member];
+                });
+            } else {
+                selectedMembers.split(',').forEach(member => {
+                    member = member.trim();
+                    instance[foreignKeyName + member] = "Unknown";
+                });
+            }
+        }
+    }
+
     handleAssets(instance, storedInstance = null) {
         this.fields.forEach(field => {
             if ((field.name in instance) && (field.type == "asset")) {
@@ -117,9 +159,10 @@ export default class Model {
             }
         });
     }
-    bindExtraData(instance) {
+    completeAssetsPath(instance) {
         let instanceCopy = { ...instance };
         this.addHostReferenceToAssetFileNames(instanceCopy);
         return instanceCopy;
     }
+    bindExtraData(instance) { return instance; }
 }

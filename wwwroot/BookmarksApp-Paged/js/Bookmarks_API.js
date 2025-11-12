@@ -33,10 +33,10 @@ class Bookmarks_API {
             }
         }, this.periodicRefreshPeriod * 1000);
     }
-    static resume_Periodic_Refresh () {
+    static resume_Periodic_Refresh() {
         this.hold_Periodic_Refresh = false;
     }
-    static stop_Periodic_Refresh () {
+    static stop_Periodic_Refresh() {
         this.hold_Periodic_Refresh = true;
     }
     static async HEAD() {
@@ -94,17 +94,13 @@ class Bookmarks_API {
         });
     }
     static async Delete(id) {
+        Bookmarks_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
                 url: this.API_URL() + "/" + id,
                 type: "DELETE",
-                complete: () => {
-                    Bookmarks_API.initHttpState();
-                    resolve(true);
-                },
-                error: (xhr) => {
-                    Bookmarks_API.setHttpErrorState(xhr); resolve(null);
-                }
+                complete: () => { resolve(true); },
+                error: (xhr) => { Bookmarks_API.setHttpErrorState(xhr); resolve(null); }
             });
         });
     }

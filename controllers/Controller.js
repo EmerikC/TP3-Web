@@ -77,7 +77,7 @@ export default class Controller {
     remove(id) {
         if (this.HttpContext.path.id !== '') {
             if (this.repository.remove(id))
-                this.HttpContext.response.accepted();
+                this.HttpContext.response.deleted();
             else
                 this.HttpContext.response.notFound("Resource not found.");
         } else {

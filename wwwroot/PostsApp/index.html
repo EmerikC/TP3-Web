@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de posts</title>
+
+    <link rel="site.webmanifest" href="manifest.json" />
+    <link rel="icon" href="news-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/posts.css">
+</head>
+
+<body>
+    <div id="main">
+        <div id="header">
+            <img src="news-logo.png" class="appLogo" alt="" title="Gestionnaire de posts">
+            <h4 id="actionTitle">Fil de nouvelles</h4>
+            <i class="cmdIcon fa fa-search" id="toggleSearch" title="Rechercher"></i>
+            <i class="cmdIcon fa fa-plus" id="createPost" title="Ajouter un post"></i>
+            <i class="cmdIcon fa fa-times" id="abort" title="Annuler"></i>
+            <div class="dropdown ms-auto" id="dropdownMenu">
+                <div data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+                </div>
+                <div class="dropdown-menu noselect" id="DDMenu">
+                    <div class="dropdown-item menuItemLayout" id="aboutCmd">
+                        <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="searchSection">
+            <div id="searchContainer">
+                <input type="text" id="searchInput" placeholder="Rechercher...">
+            </div>
+        </div>
+        <div id="content">
+            <div id="scrollPanel">
+                <div id="postsPanel" class="postsContainer">
+                    <!-- Used for items size -->
+                    <div id="postSample" class="postRow">
+                        <div class="postContainer">
+                            <div class="postLayout">
+                                <div class="postHeader">
+                                    <span class="postCategory">Sample Category</span>
+                                    <h5 class="postTitle">Sample Title</h5>
+                                </div>
+                                <div class="postDate">1 janvier 2024</div>
+                                <div class="postText hideExtra">Sample text content that might be quite long and needs to be truncated with the hideExtra class to show the ellipsis effect properly.</div>
+                                <div class="postFooter">
+                                    <i class="expandText bi bi-chevron-double-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="js/Posts_API.js"></script>
+    <script src="js/dateUtilities.js"></script>
+    <script src="js/ImageControl.js"></script>
+    <script src="js/pageManager.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/appUI.js"></script>
+</body>
+
+</html>

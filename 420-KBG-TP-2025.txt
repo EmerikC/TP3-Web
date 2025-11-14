@@ -1,0 +1,54 @@
+Objectifs du travail: ajouter une fonctionnalité Posts et une application cliente Posts, en se fiant ax modèles déjà existants et selon les critères suivants:
+
+Côté serveur:
+Bâtir un service Web Posts offrant les points d’entrées CRUD.
+
+Il sera basé sur le modèle Post comportant les champs suivants:
+- Id (string sécurisée)(UUID)
+- Title (string)
+- Text (string)
+- Category (string)
+- Image (asset)
+- Creation (integer)
+
+Il devra utiliser la structure d'API présente et implémenter toutes les fonctionnalités de cette structure.
+Il devra être créé en se basant sur les autres services déjà présents
+
+Côté client:
+
+Bâtir une application web de type SPA pour présenter un fil de nouvelles avec accès en écriture.
+
+Les nouvelles seront présentées verticalement dans le viewport et devront comporter les éléments suivants:
+- La catégorie
+- Le titre
+- L'Image
+- La date d'ajout en français
+- La description
+- Icones (apparaissant au survol) donnant accès à la modification ainsi qu'au retrait
+- Icone (ailleur dans l'interface) donnant accès à la création
+
+Il faudra avoir dans l’interface la possibilité de filtrer les nouvelles par mot clé se trouvant dans le titre ou dans le
+texte des nouvelles (toutes les occurrences devront être en couleur de fond jaune).
+Le mécanisme principal de recherche est le même que pour WordsApp
+Une fonction highlightKeywords est disponible dans new-functions.js, elle devra être utilisée.
+
+Il faudra aussi permettre de filtrer les nouvelles par catégories
+Le filtrage par catégorie implémente la même logique que BookmarksApp
+
+Le fil de nouvelles devra présenter les nouvelles en ordre chronologique décroissant de date d’ajout.
+Il faudra aussi rafraîchir périodiquement en se fiant au ETag, en utilisant la structure présente.
+
+Il faudra permettre d’agrandir/réduire les textes des posts avec les icones suivants:
+- Aggrandir: bi bi-chevron-double-down (en bleu comme les autres icones)
+- Réduire: bi bi-chevron-double-up (en bleu comme les autres icones)
+Des classes CSS sont disponibles et dans new-css.css, elles devront être utilisées
+
+Le défilement du fil de nouvelles devra être paginé
+Le défilement par pagination devra se baser sur les fonctionnalité déjà implémentées dans WordsApp et BookmarksApp-Paged
+
+L'interface devra copier les interfaces des applications déjà existantes lorsque possible
+
+Les images devront être gérées avec la structure de composant image déjà présente
+
+Toutes les fonctions de new-functions.js devront être migrées au bon endroit, selon la structure de fichier, afin de pouvoir correctement supprimer new-functions.js
+Toutes les classes de new-css.css devront être migrées au bon endroit, selon la structure de fichier, afin de pouvoir correctement supprimer new-css.css

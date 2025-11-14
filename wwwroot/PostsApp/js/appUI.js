@@ -408,7 +408,7 @@ function renderPostForm(post = null) {
             <div class='imageUploader' 
                  newImage='${create}' 
                  controlId='Image' 
-                 imageSrc='${post.Image || "news-logo.png"}' 
+                 imageSrc='${post.Image || "/postsapp/news-logo.png"}' 
                  waitingImage="Loading_icon.gif">
             </div>
             

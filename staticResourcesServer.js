@@ -36,14 +36,10 @@ function extToContentType(filePath) {
 export function handleStaticResourceRequest(HttpContext) {
     let url;
     // handling static html API help pages 
-    if (HttpContext.path.queryString == '?') {
+    if (HttpContext.path.queryString == '?')
         url = "api-help-pages/" + `api-${HttpContext.path.model}-help.html`;
-    } else {
-        // normalize the request URL: strip query string, decode and remove leading '/'
-        url = (HttpContext.req.url || '').split('?')[0];
-        try { url = decodeURIComponent(url); } catch (e) { /* ignore */ }
-        if (url.startsWith('/')) url = url.slice(1);
-    }
+    else
+        url = HttpContext.req.url;
     let filePath = requestedStaticResource(url);
     let contentType = extToContentType(filePath);
     try {

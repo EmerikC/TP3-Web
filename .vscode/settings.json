@@ -2,5 +2,7 @@
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
-    ]
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/ba744ff1-16d8-4e55-af21-51418a0e72ab/resourceGroups/EMERIK-KBG/providers/Microsoft.Web/sites/TP3-Web",
+    "appService.deploySubpath": "."
 }

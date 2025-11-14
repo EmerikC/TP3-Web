@@ -6,11 +6,14 @@ let searchKeywords = "";
 let pageManager = null;
 let searchVisible = false;
 
-Init_UI();
+// Initialize UI when document is ready
+$(document).ready(function () {
+    Init_UI();
+});
 
 function Init_UI() {
     pageManager = new PageManager('scrollPanel', 'postsPanel', 'postSample', renderPostsFromQueryString);
-    
+
     $('#createPost').on("click", async function () {
         renderCreatePostForm();
     });
@@ -29,7 +32,33 @@ function Init_UI() {
             pageManager.reset();
         }
     });
-    
+
+    // Delegated handlers attached on document but scoped to #scrollPanel so they survive pageManager.off()
+    $(document).on('click', '#scrollPanel .expandText', function (e) {
+        // Determine post id from attribute or nearest postRow
+        let postId = $(this).attr('postId') || $(this).attr('postid') || $(this).closest('.postRow').attr('post_id');
+        if (!postId) return;
+
+        let textElement = $(`#postText_${postId}`);
+        let chevron = $(this);
+
+        if (textElement.hasClass('hideExtra')) {
+            textElement.removeClass('hideExtra').addClass('showExtra');
+            chevron.removeClass('bi-chevron-double-down').addClass('bi-chevron-double-up');
+        } else {
+            textElement.addClass('hideExtra').removeClass('showExtra');
+            chevron.removeClass('bi-chevron-double-up').addClass('bi-chevron-double-down');
+        }
+    });
+
+    $(document).on('click', '#scrollPanel .editCmd', function () {
+        renderEditPostForm($(this).attr('editPostId'));
+    });
+
+    $(document).on('click', '#scrollPanel .deleteCmd', function () {
+        renderDeletePostForm($(this).attr('deletePostId'));
+    });
+
     start_Periodic_Refresh();
     renderPosts();
 }
@@ -123,19 +152,7 @@ function renderAbout() {
                     Cette application permet de gérer une liste de nouvelles.
                 </p>
                 <p>
-                    Vous pouvez créer, modifier et supprimer des nouvelles.
-                </p>
-                <p>
-                    Les nouvelles sont affichées en ordre chronologique décroissant.
-                </p>
-                <p>
-                    Vous pouvez filtrer les nouvelles par catégorie.
-                </p>
-                <p>
-                    Vous pouvez rechercher des nouvelles par mots-clés.
-                </p>
-                <p>
-                    Les nouvelles se chargent au fur et à mesure que vous défilez.
+                    Auteur: Emerik Couture
                 </p>
             </div>
         `)
@@ -152,7 +169,7 @@ function updateDropDownMenu(categories) {
         </div>
         <div class="dropdown-divider"></div>
     `));
-    
+
     categories.forEach(category => {
         selectClass = selectedCategory === category ? "fa-check" : "fa-fw";
         DDMenu.append($(`
@@ -161,14 +178,14 @@ function updateDropDownMenu(categories) {
             </div>
         `));
     });
-    
+
     DDMenu.append($(`
         <div class="dropdown-divider"></div> 
         <div class="dropdown-item menuItemLayout" id="aboutCmd">
             <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
         </div>
     `));
-    
+
     $('#aboutCmd').on("click", function () {
         renderAbout();
     });
@@ -197,51 +214,30 @@ async function compileCategories() {
 
 async function renderPostsFromQueryString(itemsPanel, queryString) {
     hold_Periodic_Refresh = false;
-    
+
     queryString += "&sort=-Creation";
     if (selectedCategory != "") queryString += "&Category=" + selectedCategory;
     if (searchKeywords !== "") queryString += "&keywords=" + searchKeywords.replace(/ /g, ',');
-    
+
     let posts = await Posts_API.Get(queryString);
     currentETag = Posts_API.Etag;
-    
+
     if (posts !== null) {
         // Update categories menu with ALL categories (not just filtered ones)
         compileCategories();
-        
+
         // Add posts to page
         posts.forEach(post => {
             itemsPanel.append(renderPost(post));
         });
-        
+
         // Highlight keywords after rendering
         if (searchKeywords !== "") {
             highlightKeywords(searchKeywords);
         }
-        
-        // Attach click events for expand/collapse
-        $('.expandText').on("click", function () {
-            let postId = $(this).attr("postId");
-            let textElement = $(`#postText_${postId}`);
-            let chevron = $(this);
-            
-            if (textElement.hasClass('hideExtra')) {
-                textElement.removeClass('hideExtra').addClass('showExtra');
-                chevron.removeClass('bi-chevron-double-down').addClass('bi-chevron-double-up');
-            } else {
-                textElement.addClass('hideExtra').removeClass('showExtra');
-                chevron.removeClass('bi-chevron-double-up').addClass('bi-chevron-double-down');
-            }
-        });
-        
-        // Attach click events for edit/delete
-        $(".editCmd").on("click", function () {
-            renderEditPostForm($(this).attr("editPostId"));
-        });
-        $(".deleteCmd").on("click", function () {
-            renderDeletePostForm($(this).attr("deletePostId"));
-        });
-        
+
+        // Event handlers are delegated from Init_UI(); no per-render binding needed
+
         // Return true if no posts (end of data)
         return posts.length === 0;
     } else {
@@ -283,7 +279,7 @@ async function renderEditPostForm(id) {
     $("#abort").show();
     $(".dynamicContent").remove();
     $("#content").append($("<div class='waitingGifcontainer dynamicContent'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
-    
+
     let post = await Posts_API.Get(id);
     if (post !== null)
         renderPostForm(post);
@@ -302,10 +298,10 @@ async function renderDeletePostForm(id) {
     $("#actionTitle").text("Retrait");
     $(".dynamicContent").remove();
     $("#content").append($("<div class='waitingGifcontainer dynamicContent'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
-    
+
     let post = await Posts_API.Get(id);
     $(".dynamicContent").remove();
-    
+
     if (post !== null) {
         $("#content").append(`
         <div class="postDeleteForm dynamicContent">
@@ -363,12 +359,12 @@ function renderPostForm(post = null) {
     $('#searchSection').removeClass('visible');
     $("#abort").show();
     $(".dynamicContent").remove();
-    
+
     let create = post == null;
     if (create) {
         post = newPost();
     }
-    
+
     $("#actionTitle").text(create ? "Création" : "Modification");
     $("#content").append(`
         <form class="form dynamicContent" id="postForm">
@@ -431,14 +427,14 @@ function renderPostForm(post = null) {
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </form>
     `);
-    
+
     initImageUploaders();
     initFormValidation();
-    
+
     $('#postForm').on("submit", async function (event) {
         event.preventDefault();
         let postData = getFormData($("#postForm"));
-        
+
         // Handle date: if editing and checkbox is unchecked, update to current date
         let dateChanged = false;
         if (!create && !$('#preserveDate').is(':checked')) {
@@ -447,10 +443,10 @@ function renderPostForm(post = null) {
         } else {
             postData.Creation = parseInt(postData.Creation);
         }
-        
+
         $(".dynamicContent").remove();
         $("#content").append($("<div class='waitingGifcontainer dynamicContent'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
-        
+
         let result = await Posts_API.Save(postData, create);
         if (result) {
             // If date changed, reset to top to show the edited post in new position
@@ -466,7 +462,7 @@ function renderPostForm(post = null) {
                 renderError();
         }
     });
-    
+
     $('#cancel').on("click", function () {
         showPosts();
     });
@@ -494,7 +490,7 @@ function renderPostPreview(post) {
 function renderPost(post) {
     let date = convertToFrenchDate(post.Creation);
     let imageHtml = post.Image ? `<img class="postImage" src="${post.Image}" alt="${post.Title}">` : '';
-    
+
     return $(`
         <div class="postRow" post_id="${post.Id}">
             <div class="postContainer">
@@ -553,7 +549,7 @@ function highlight(text, keyword) {
 // Helper function: highlightKeywords (from new-functions.js)
 function highlightKeywords(keywords) {
     let keywordArray = keywords.toLowerCase().split(' ');
-    
+
     $('.postTitle').each(function () {
         let originalText = $(this).text();
         let highlightedText = originalText;
@@ -564,7 +560,7 @@ function highlightKeywords(keywords) {
         });
         $(this).html(highlightedText);
     });
-    
+
     $('.postText').each(function () {
         let originalText = $(this).text();
         let highlightedText = originalText;

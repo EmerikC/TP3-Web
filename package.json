@@ -20,6 +20,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node http-server.js"
   },
-  "author": "Votre nom",
+  "author": "Emerik Couture",
   "license": "ISC"
 }

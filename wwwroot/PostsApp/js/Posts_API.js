@@ -1,5 +1,5 @@
 class Posts_API {
-    static API_URL() { return "http://localhost:5000/api/posts" };
+    static API_URL() { return "https://tp3-web-c4a8cwh2d7cvdydt.canadacentral-01.azurewebsites.net/api/posts" };
     static initHttpState() {
         this.currentHttpError = "";
         this.currentStatus = 0;

@@ -5,6 +5,8 @@ let hold_Periodic_Refresh = false;
 let searchKeywords = "";
 let pageManager = null;
 let searchVisible = false;
+// Track which posts are currently expanded so we can reapply after re-rendering
+let expandedPosts = new Set();
 
 // Initialize UI when document is ready
 $(document).ready(function () {
@@ -45,9 +47,13 @@ function Init_UI() {
         if (textElement.hasClass('hideExtra')) {
             textElement.removeClass('hideExtra').addClass('showExtra');
             chevron.removeClass('bi-chevron-double-down').addClass('bi-chevron-double-up');
+            // remember expanded state
+            expandedPosts.add(postId);
         } else {
             textElement.addClass('hideExtra').removeClass('showExtra');
             chevron.removeClass('bi-chevron-double-up').addClass('bi-chevron-double-down');
+            // remove from expanded set
+            expandedPosts.delete(postId);
         }
     });
 
@@ -491,6 +497,11 @@ function renderPost(post) {
     let date = convertToFrenchDate(post.Creation);
     let imageHtml = post.Image ? `<img class="postImage" src="${post.Image}" alt="${post.Title}">` : '';
 
+    // If this post is in the expanded set, render it expanded
+    let isExpanded = expandedPosts.has(post.Id);
+    let textClass = isExpanded ? 'postText showExtra' : 'postText hideExtra';
+    let chevronClass = isExpanded ? 'expandText bi bi-chevron-double-up' : 'expandText bi bi-chevron-double-down';
+
     return $(`
         <div class="postRow" post_id="${post.Id}">
             <div class="postContainer">
@@ -501,9 +512,9 @@ function renderPost(post) {
                     </div>
                     ${imageHtml}
                     <div class="postDate">${date}</div>
-                    <div id="postText_${post.Id}" class="postText hideExtra">${post.Text}</div>
+                    <div id="postText_${post.Id}" class="${textClass}">${post.Text}</div>
                     <div class="postFooter">
-                        <i class="expandText bi bi-chevron-double-down" postId="${post.Id}" title="Afficher plus"></i>
+                        <i class="${chevronClass}" postId="${post.Id}" title="Afficher plus"></i>
                     </div>
                 </div>
                 <div class="postCommandPanel">

@@ -37,23 +37,23 @@ function Init_UI() {
 
     // Delegated handlers attached on document but scoped to #scrollPanel so they survive pageManager.off()
     $(document).on('click', '#scrollPanel .expandText', function (e) {
-        // Determine post id from attribute or nearest postRow
-        let postId = $(this).attr('postId') || $(this).attr('postid') || $(this).closest('.postRow').attr('post_id');
+        // Determine post id from data attribute on the icon or the nearest .postRow[data-post-id]
+        let postId = $(this).attr('data-post-id') || $(this).attr('data-postid') || $(this).closest('.postRow').attr('data-post-id') || $(this).closest('.postRow').attr('post_id');
         if (!postId) return;
 
         let textElement = $(`#postText_${postId}`);
-        let chevron = $(this);
+    let chevron = $(this);
 
         if (textElement.hasClass('hideExtra')) {
             textElement.removeClass('hideExtra').addClass('showExtra');
             chevron.removeClass('bi-chevron-double-down').addClass('bi-chevron-double-up');
             // remember expanded state
-            expandedPosts.add(postId);
+            expandedPosts.add(String(postId));
         } else {
             textElement.addClass('hideExtra').removeClass('showExtra');
             chevron.removeClass('bi-chevron-double-up').addClass('bi-chevron-double-down');
             // remove from expanded set
-            expandedPosts.delete(postId);
+            expandedPosts.delete(String(postId));
         }
     });
 
@@ -503,7 +503,7 @@ function renderPost(post) {
     let chevronClass = isExpanded ? 'expandText bi bi-chevron-double-up' : 'expandText bi bi-chevron-double-down';
 
     return $(`
-        <div class="postRow" post_id="${post.Id}">
+        <div class="postRow" data-post-id="${post.Id}" post_id="${post.Id}">
             <div class="postContainer">
                 <div class="postLayout">
                     <div class="postHeader">
@@ -514,7 +514,7 @@ function renderPost(post) {
                     <div class="postDate">${date}</div>
                     <div id="postText_${post.Id}" class="${textClass}">${post.Text}</div>
                     <div class="postFooter">
-                        <i class="${chevronClass}" postId="${post.Id}" title="Afficher plus"></i>
+                        <i class="${chevronClass}" data-post-id="${post.Id}" title="Afficher plus"></i>
                     </div>
                 </div>
                 <div class="postCommandPanel">
